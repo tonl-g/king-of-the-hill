@@ -15,14 +15,14 @@ using Address for address payable;
 
 // State variables
 mapping(address => uint256) private _balances;
-address private _firstOwner;
-address private _lastOwner;
+address private _firstOwner; // 1er owner et 1ere mise
+address private _lastOwner; // winner
 address private _owner;
-uint256 private _turn;
-uint256 currentPot = address(this).balance - msg.value;
-uint256 private _percentageFirstOwner;
-uint256 private _percentageLastOwner;
-bool private _endGame;
+uint256 private _turn; // 1 tour de jeu
+// uint256 currentPot = address(this).balance - msg.value;
+uint256 private _percentageFirstOwner; // 10%
+uint256 private _percentageLastOwner; // 80%
+bool private _endGame; // fin du tour de jeu
 
 // Events
 event JointPotting(address indexed sender, uint256 ammount);
@@ -71,9 +71,8 @@ function endGame() public onlyOwner {
     require(_turn >= block.number, "KingOfTheHill: End game, please waiting a new player restarts game!");
     payable(msg.sender).sendValue(address(this).balance);
     _endGame = true;
-    _turn = 0;
-    _firstOwner += percentageFirstOwner_;
-    _lastOwner += percentageLastOwner_;
+    // _firstOwner += percentageFirstOwner_;
+    // _lastOwner += percentageLastOwner_;
     }
     
 function setPercentage80(uint256 percentageFirstOwner_) public onlyOwner {
