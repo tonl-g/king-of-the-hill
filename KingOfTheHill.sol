@@ -5,38 +5,40 @@ pragma solidity ^0.8.0;
 
 // Import statements
 import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/Address.sol";
-// import "./Ownable.sol";
 
 // Contract
 contract KingOfTheHill {
-
 // Library usage
 using Address for address payable;
 
 // State variables
-mapping(address => uint256) private _balances;
 address private _firstOwner; // 1er owner et 1ere mise
 address private _lastOwner; // winner
 address private _owner;
 uint256 private _turn; // 1 tour de jeu
-// uint256 currentPot = address(this).balance - msg.value;
 uint256 private _percentageFirstOwner; // 10%
 uint256 private _percentageLastOwner; // 80%
-bool private _endGame; // fin du tour de jeu
+bool private _endTurn; // fin du tour de jeu
 
 // Events
-event JointPotting(address indexed sender, uint256 ammount);
+event SendPot(address indexed sender, uint256 value);
 
 /** constructor */
-constructor(address firstOwner_, uint256 delay_) payable firstStake {
+constructor(address firstOwner_, uint256 delay_) payable firstBet {
     /** Only firstOwner can bet at beggining
       * delay => 1 bloc = 10 secondes
       */
         _firstOwner = firstOwner_;
         _turn = block.number + delay_ * (1 * 10);
     }
-
+    
 // Function modifiers
+
+modifier firstBet() { 
+    require(msg.value == 1e18, "KingOfTheHill: Start game cost 1 wei!"); // 1 wei
+    _;
+  }
+  
 modifier onlyOwner() {
         require(msg.sender == _owner, "KingOfTheHill: Only owner can play!");
         _;
@@ -46,50 +48,46 @@ modifier notOwner() {
         require(msg.sender != _owner, "KingOfTheHill: You are not allowed to use this functionality!");
         _;
     }
-    
-modifier firstStake() { 
-    require(msg.value == 1e18, "KingOfTheHill: Start game cost 1 wei!"); // 1 wei
-    _;
-  }
-
+  
 // Functions
-
-function pot(address sender, uint256 amount) external payable firstStake onlyOwner notOwner { // mise en jeu
-    _balances[sender] += amount;
-    emit JointPotting(sender, amount);
+function pot() external payable {
+        emit SendPot(msg.sender, msg.value);
     }
     
     receive() external payable {
+        emit SendPot(msg.sender, msg.value);
     }
     
 function game() public payable onlyOwner {
     require(msg.value >= address(this).balance * 2, "KingOfTheHill: Bet *2 the previous bet!");
-    _turn += 1;
     }
     
-function endGame() public onlyOwner {
+function endTurn() public payable {
     require(_turn >= block.number, "KingOfTheHill: End game, please waiting a new player restarts game!");
     payable(msg.sender).sendValue(address(this).balance);
-    _endGame = true;
-    // _firstOwner += percentageFirstOwner_;
-    // _lastOwner += percentageLastOwner_;
+    _endTurn = true;
     }
     
-function setPercentage80(uint256 percentageFirstOwner_) public onlyOwner {
+function setPercentage80(uint256 percentageFirstOwner_) public payable onlyOwner {
         require(
             _percentageFirstOwner >= 0 && _percentageFirstOwner == 80, "KingOfTheHill: Only 80%!");
             _percentageFirstOwner = percentageFirstOwner_;
+            uint256 potOwner80 = percentageFirstOwner_;
+            payable(msg.sender).sendValue(potOwner80);
     }
     
-function setPercentage10(uint256 percentageLastOwner_) public onlyOwner {
+function setPercentage10(uint256 percentageLastOwner_) public payable onlyOwner {
         require(_percentageLastOwner >= 0 && _percentageLastOwner == 10, "KingOfTheHill: Only 10%!");
         _percentageLastOwner = percentageLastOwner_;
+        uint256 potOwner10 = percentageLastOwner_;
+        payable(msg.sender).sendValue(potOwner10);
     }
     
 function viewPot() public view notOwner returns (uint256) {
         return address(this).balance;
     }
-
+    
 }
+
 
 
