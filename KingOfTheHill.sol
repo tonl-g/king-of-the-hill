@@ -68,11 +68,11 @@ function pot() external payable {
         emit SendPot(msg.sender, msg.value);
     }
     
-function game() public payable onlyOwner {
+function play() public payable onlyOwner {
     require(msg.value >= address(this).balance * 2, "KingOfTheHill: Bet *2 the previous bet!");
     }
     
-function endTurn() public payable {
+function restartTurn() public payable {
     require(_turn >= block.number, "KingOfTheHill: End game, please waiting a new player restarts game!");
     payable(msg.sender).sendValue(address(this).balance);
     _endTurn = true;

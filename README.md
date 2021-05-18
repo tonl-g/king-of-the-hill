@@ -29,7 +29,8 @@ Le reste de la somme envoyée par le nouveau joueur pour setup un nouveau tour d
 Natspec
 Utiliser des commentaires natspec comme vu en cours et dans la documentation.
 
-
+https://kovan.etherscan.io/tx/0x27ff718c54f5d51d3769a30072bd5e3018bdf33d3951c9100475423885cfc676
+0xf84479c953197e799496b92f6860b989764e0cd5
 
 
 
