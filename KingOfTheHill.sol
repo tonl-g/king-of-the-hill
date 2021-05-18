@@ -39,6 +39,16 @@ modifier firstBet() {
     _;
   }
   
+modifier onlyFirstOwner() {
+        require(msg.sender == _firstOwner, "KingOfTheHill: Only firstowner can recuperate 10%!");
+        _;
+    }
+    
+modifier onlyLastOwner() {
+        require(msg.sender == _lastOwner, "KingOfTheHill: Only lastowner can recuperate 80%!");
+        _;
+    }
+  
 modifier onlyOwner() {
         require(msg.sender == _owner, "KingOfTheHill: Only owner can play!");
         _;
@@ -68,19 +78,19 @@ function endTurn() public payable {
     _endTurn = true;
     }
     
-function setPercentage80(uint256 percentageFirstOwner_) public payable onlyOwner {
+function setPercentage10(uint256 percentageFirstOwner_) public payable onlyFirstOwner {
         require(
-            _percentageFirstOwner >= 0 && _percentageFirstOwner == 80, "KingOfTheHill: Only 80%!");
+            _percentageFirstOwner >= 0 && _percentageFirstOwner == 10, "KingOfTheHill: Only 10%!");
             _percentageFirstOwner = percentageFirstOwner_;
-            uint256 potOwner80 = percentageFirstOwner_;
-            payable(msg.sender).sendValue(potOwner80);
+            uint256 potOwner10 = percentageFirstOwner_;
+            payable(msg.sender).sendValue(potOwner10);
     }
     
-function setPercentage10(uint256 percentageLastOwner_) public payable onlyOwner {
-        require(_percentageLastOwner >= 0 && _percentageLastOwner == 10, "KingOfTheHill: Only 10%!");
+function setPercentage80(uint256 percentageLastOwner_) public payable onlyLastOwner {
+        require(_percentageLastOwner >= 0 && _percentageLastOwner == 80, "KingOfTheHill: Only 80%!");
         _percentageLastOwner = percentageLastOwner_;
-        uint256 potOwner10 = percentageLastOwner_;
-        payable(msg.sender).sendValue(potOwner10);
+        uint256 potOwner80 = percentageLastOwner_;
+        payable(msg.sender).sendValue(potOwner80);
     }
     
 function viewPot() public view notOwner returns (uint256) {
